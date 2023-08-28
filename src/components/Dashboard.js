@@ -6,7 +6,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 
 import TimeOffStatistics from './TimeOffStatistics';
-import '../component-designs/Dashboard.css';
+//import '../component-designs/Dashboard.css';
 
 
 const Dashboard = () => {

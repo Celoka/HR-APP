@@ -1,7 +1,7 @@
 // EmployeeListPage.js
 
 import React, { useState, useEffect } from 'react';
-import './EmployeeListPage.css'; // Import your CSS for styling
+//import './EmployeeListPage.css'; // Import your CSS for styling
 
 const EmployeeListPage = () => {
   // Dummy employee data
@@ -51,7 +51,7 @@ const EmployeeListPage = () => {
   );
 
   // Function to navigate to the employee details page
-  const navigateToEmployeeDetails = (employeeId) => {
+  const navigateToEmployeeDetails = () => {
     // Implement the navigation logic to the employee details page
     // You can use a routing library like React Router for this
   };
