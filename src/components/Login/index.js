@@ -1,35 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Toastify from 'toastify-js';
 import { useNavigate } from "react-router-dom";
+import { useMutation, } from 'react-query';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
+import { postData, toastProperty } from '../../Data';
 
 import './index.scss';
+
 
 const Login = () => {
   const navigate = useNavigate();
   const [data, setData] = useState({
-    email: '',
+    emailAddress: '',
     password: '',
   });
 
   const handleChange = ({ target }) => {
     const { name, value } = target;
-    console.log(name, value, 'lololl');
-
     setData({
       ...data,
       [name]: value
     })
   };
 
-  const handleRedirect = () => {
-    navigate('/register');
-  };
+  const mutation = useMutation((data) => postData(data, 'user/login'), {
+    onSuccess: (res) => {
+      if(res.msg) {
+        Toastify({
+          text: "Email or password not correct",
+          ...toastProperty,
+          style: {
+            background: "rgb(255, 95, 109)"
+          },
+        }).showToast();
+      }
+      else {
+        localStorage.setItem('token', res.payload.token);
+        Toastify({
+          text: "Login was successful",
+          ...toastProperty,
+          style: {
+            background: "linear-gradient(to right, #00b09b, #96c93d)",
+          },
+        }).showToast();
+        navigate('/dashboard');
+      }
+    
+    },
+  });
 
-  const handleSubmit = () => {
-    navigate('/dashboard');
-  };
+  const handleSubmit = async () => {
+    if(data.emailAddress.length === 0) {
+      Toastify({
+        text: "Email Address is empty",
+        ...toastProperty,
+        style: {
+          background: "rgb(255, 95, 109)"
+        },
+      }).showToast();
+    } else if (data.password.length === 0) {
+        Toastify({
+          text: "Password is empty",
+          ...toastProperty,
+          style: {
+            background: "rgb(255, 95, 109)"
+          },
+        }).showToast();
+    } else {
+      mutation.mutate(data);
+    }
+  }
+
+  const handleRedirect = () => navigate('/register');
 
   return (
     <section className="auth">
@@ -46,7 +90,7 @@ const Login = () => {
             <Form.Label 
               column sm="4" 
               className="auth__text"
-              name="email"
+              name="emailAddress"
             >
               Email
             </Form.Label>
@@ -55,7 +99,7 @@ const Login = () => {
               type="email" 
               placeholder="example@email.com"
               onChange={handleChange}
-              name="email"
+              name="emailAddress"
             />
           </Form.Group>
           <Form.Group 
@@ -86,7 +130,9 @@ const Login = () => {
               <button 
                 className="auth__reg"
                 onClick={handleRedirect}
-              >Click to Register</button>
+              >
+                Click to Register
+              </button>
           </p>
       </section>
     </section>
