@@ -2,11 +2,13 @@
   display: flex;
   // flex-direction: column;
 
+  
+
   &__sidebar {
     flex: 1;
   }
 
   &__layout {
-    flex: 4;
+    flex: 6;
   }
 }
