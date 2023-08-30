@@ -27,7 +27,8 @@ const Login = () => {
 
   const mutation = useMutation((data) => postData(data, 'user/login'), {
     onSuccess: (res) => {
-      if(res.msg) {
+      console.log(res, 'res')
+      if(res.msg === 'User does not exist') {
         Toastify({
           text: "Email or password not correct",
           ...toastProperty,
