@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Toastify from 'toastify-js';
 import { useNavigate } from "react-router-dom";
 import { useMutation, } from 'react-query';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
-import { postData, toastProperty } from '../../Data';
+import { postData, toastProperty, error, success } from '../../Data';
 
 import './index.scss';
 
@@ -32,23 +32,19 @@ const Login = () => {
         Toastify({
           text: "Email or password not correct",
           ...toastProperty,
-          style: {
-            background: "rgb(255, 95, 109)"
-          },
+          style: error,
         }).showToast();
       }
       else {
         localStorage.setItem('token', res.payload.token);
+        localStorage.setItem('user', JSON.stringify(res.payload.user));
         Toastify({
           text: "Login was successful",
           ...toastProperty,
-          style: {
-            background: "linear-gradient(to right, #00b09b, #96c93d)",
-          },
+          style: success,
         }).showToast();
         navigate('/dashboard');
       }
-    
     },
   });
 
@@ -57,17 +53,13 @@ const Login = () => {
       Toastify({
         text: "Email Address is empty",
         ...toastProperty,
-        style: {
-          background: "rgb(255, 95, 109)"
-        },
+        style: error
       }).showToast();
     } else if (data.password.length === 0) {
         Toastify({
           text: "Password is empty",
           ...toastProperty,
-          style: {
-            background: "rgb(255, 95, 109)"
-          },
+          style:error
         }).showToast();
     } else {
       mutation.mutate(data);
@@ -123,7 +115,7 @@ const Login = () => {
             />
           </Form.Group>
         </Form>
-          <Button variant="primary" size="lg" onClick={handleSubmit}>Login</Button>
+          <Button variant="outline-primary" size="lg" onClick={handleSubmit}>Login</Button>
           <p 
             className="auth__none"
           >

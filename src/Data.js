@@ -1,3 +1,6 @@
+import { createContext } from 'react';
+import { QueryClient } from 'react-query'
+
 export const baseUrlLink = 'https://sheltered-wildwood-06244-2353b78d164a.herokuapp.com/api/v1';
 
 export const postData = async (data, url) => {
@@ -12,7 +15,6 @@ export const postData = async (data, url) => {
   return response.json();
 };
 
-
 export const toastProperty = {
   duration: 8000,
   newWindow: true,
@@ -24,3 +26,14 @@ export const toastProperty = {
     y: 150
   },
 }
+
+export const success =  {
+  background: "linear-gradient(to right, #00b09b, #96c93d)",
+};
+
+export const error =  {
+  background: "rgb(255, 95, 109)",
+};
+
+export const UserDetails = createContext();
+export const queryClient = new QueryClient();

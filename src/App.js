@@ -1,29 +1,71 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query'
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClientProvider } from 'react-query'
 import Login from './components/Login';
 import Signup from './components/Signup';
-//import Registration from './components/Registration';
-//import Dashboard from './components/Dashboard'
-import EmployeeList from './components/EmployeeList';
 import Dashboards from './/components/Dashboards'
+import { UserDetails, queryClient } from './Data';
 
 import 'bootstrap/dist/css/bootstrap.css';
-import "toastify-js/src/toastify.css"
+import "toastify-js/src/toastify.css";
 
-const queryClient = new QueryClient();
+const ProtectedRoute = ({ tokenItem, children }) => {
+  if (!tokenItem) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
 
+const UnProtectedRoute = ({ tokenItem, children }) => {
+  if (tokenItem) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+};
 
 const App = () => {
+  const [userDetails, setUserDetails] = useState({});
+  const [tokenItem, setTokenItem] = useState();
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    if(user) {
+      setUserDetails( JSON.parse(user));
+      setTokenItem(token);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Signup />} />
-        <Route path="/dashboard" element={<Dashboards />} />
-        <Route path="/employees" element={<EmployeeList />} />
-      </Routes>
+      <UserDetails.Provider value={userDetails}>
+        <Routes>
+          <Route path="/" 
+            element={
+            <UnProtectedRoute tokenItem={tokenItem}>
+              <Login />
+            </UnProtectedRoute>
+            }
+          />
+          <Route 
+            path="/login" 
+            element={
+              <UnProtectedRoute tokenItem={tokenItem}>
+                <Login />
+              </UnProtectedRoute>
+            } 
+          />
+          <Route path="/register" element={<Signup />} />
+          <Route 
+            path="/dashboard"
+            element={
+              <ProtectedRoute tokenItem={tokenItem}>
+                <Dashboards />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </UserDetails.Provider>
     </QueryClientProvider>
   );
 };

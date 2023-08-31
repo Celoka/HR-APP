@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { useMutation, toastProperty } from 'react-query';
 import { useNavigate } from "react-router-dom";
 import Toastify from 'toastify-js';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
-import { postData } from '../../Data';
-import { useMutation, toastProperty } from 'react-query';
+import { postData, error, success } from '../../Data';
 
 import './index.scss';
 
@@ -33,17 +33,13 @@ const Signup = () => {
         Toastify({
           text: "Email used already",
           ...toastProperty,
-          style: {
-            background: "rgb(255, 95, 109)"
-          },
+          style: error,
         }).showToast()
     }else {
       Toastify({
         text: "Login was successful",
         ...toastProperty,
-        style: {
-          background: "linear-gradient(to right, #00b09b, #96c93d)",
-        },
+        style: success,
       }).showToast();
       navigate('/login')
       }
@@ -55,33 +51,25 @@ const Signup = () => {
       Toastify({
         text: "Email Address is empty",
         ...toastProperty,
-        style: {
-          background: "rgb(255, 95, 109)"
-        },
+        style:error,
       }).showToast();
     } else if (data.password.length === 0) {
         Toastify({
           text: "Password is empty",
           ...toastProperty,
-          style: {
-            background: "rgb(255, 95, 109)"
-          },
+          style: error,
         }).showToast();
       } else if (data.firstName.length === 0) {
         Toastify({
           text: "First name is empty",
           ...toastProperty,
-          style: {
-            background: "rgb(255, 95, 109)"
-          },
+          style: error
         }).showToast();
       } else if (data.lastName.length === 0) {
         Toastify({
           text: "Last Name is empty",
           ...toastProperty,
-          style: {
-            background: "rgb(255, 95, 109)"
-          },
+          style:error
         }).showToast();
     } else {
       mutation.mutate(data);
@@ -177,7 +165,8 @@ const Signup = () => {
             />
           </Form.Group>
         </Form>
-          <Button variant="primary" size="lg" onClick={handleSubmit}>Submit</Button>
+          <Button 
+            variant="outline-primary"size="lg" onClick={handleSubmit}>Submit</Button>
           <p 
             className="auth__none"
           >
