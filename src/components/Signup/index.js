@@ -6,6 +6,7 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 import { postData, error, success } from '../../Data';
+import LoadingState from '../Loading';
 
 import './index.scss';
 
@@ -165,8 +166,17 @@ const Signup = () => {
             />
           </Form.Group>
         </Form>
-          <Button 
-            variant="outline-primary"size="lg" onClick={handleSubmit}>Submit</Button>
+          {
+            mutation.isLoading 
+              ? <LoadingState />
+              :  <Button 
+                    variant="outline-primary" 
+                    size="lg" 
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </Button>
+          }
           <p 
             className="auth__none"
           >

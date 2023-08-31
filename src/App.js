@@ -35,10 +35,16 @@ const App = () => {
       setTokenItem(token);
     };
   }, []);
+  const value = {
+    setUserDetails: setUserDetails,
+    userDetails: userDetails,
+    setTokenItem: setTokenItem,
+    tokenItem: tokenItem
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
-      <UserDetails.Provider value={userDetails}>
+      <UserDetails.Provider value={value}>
         <Routes>
           <Route path="/" 
             element={
