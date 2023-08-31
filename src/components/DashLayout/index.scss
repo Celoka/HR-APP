@@ -35,7 +35,7 @@
   }
 
   &__first-main {
-    flex: 2;
+    flex: 3;
     padding: 10px;
     border-right: 2px solid #F6F7F8;
     padding-right: 20px;
@@ -124,6 +124,8 @@
   &__down {
     display: flex;
     flex-wrap: wrap;
+    margin-top: 50px;
+    gap: 20px;
   }
 
   &__down-div1 {
@@ -132,11 +134,14 @@
 
   &__down-div2 {
     flex: 1;
+    padding-left: 50px;
+    border-radius: 20px;
   }
 
   &__down-h1 {
     font-size: 30px;
     font-weight: bold;
+    margin-bottom: 30px;
   }
 
   &__down-p {
@@ -159,5 +164,27 @@
     display: flex;
     align-items: center;
     gap: 10px;
+  }
+
+  &__down-one {
+    display: flex;
+    align-items: start;
+    border: 2px solid #F6F7F8;
+    padding: 10px;
+  }
+  
+  &__down-divv {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    h2 {
+      font-size: 25px;
+      font-weight: bold;
+    }
+  }
+
+  &__sche {
+    font-size: 40px;
+    font-weight: bold;
   }
 }

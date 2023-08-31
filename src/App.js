@@ -8,6 +8,7 @@ import { UserDetails, queryClient } from './Data';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import "toastify-js/src/toastify.css";
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const ProtectedRoute = ({ tokenItem, children }) => {
   if (!tokenItem) {

@@ -2,6 +2,12 @@
   background-color: #F8F9F9;
   height: 100vh;
 
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   &__title {
     padding: 30px;
     color: #444855;

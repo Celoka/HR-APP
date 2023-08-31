@@ -8,10 +8,22 @@ import SettingSvg from '../../svg/Setting';
 import './index.scss';
 
 const Sidebar = ({ setCurrentScreen }) => {
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const [active, setActive] = useState('dashboard');
+  const toggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible);
+  };
   return (
     <section className="sidebar">
-      <h1 className="sidebar__title">HR</h1>
+      <button
+        className="sidebar__top"
+        onClick={toggleSidebar}
+      >
+        <h1 className="sidebar__title">HR</h1>
+        {/* <div>
+          <i className={`fa ${sidebarVisible ? 'fa-times' : 'fa-bars'}`}></i>
+        </div> */}
+      </button>
       <ul className="sidebar__ul">
         <li 
           className={`sidebar__li ${active === "dashboard" ? "sidebar__li-active" : " "}`}

@@ -1,6 +1,8 @@
 import React, { useContext, useState } from 'react';
+import moment from 'moment';
 import { useNavigate } from "react-router-dom";
 import Toastify from 'toastify-js';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
 import Button from 'react-bootstrap/Button';
 import { UserDetails, toastProperty, success } from '../../Data';
 import TimeOffStatistics from '../TimeOffStatistics';
@@ -44,6 +46,25 @@ const DashLayout = ({ currentScreen }) => {
     user.setTokenItem()
     navigate('/login');
   };
+
+  const getEvents = () => {
+    return [
+      {
+        title: 'Meeting 1',
+        start: new Date(2023, 7, 25, 10, 0),
+        end: new Date(2023, 7, 25, 11, 0),
+      },
+      {
+        title: 'Meeting 2',
+        start: new Date(2023, 7, 26, 14, 0),
+        end: new Date(2023, 7, 26, 15, 0),
+      },
+      // Add more events here
+    ];
+  };
+
+  const localizer = momentLocalizer(moment);
+  const [events] = useState(getEvents());
 
   const DashboardContent = () => (
     <section className="dashLayout__first">
@@ -98,14 +119,39 @@ const DashLayout = ({ currentScreen }) => {
 
           <div className="dashLayout__down-div2">
             <h1  className="dashLayout__down-h1">Employee Ranks</h1>
+            <div className="dashLayout__down-one">
+              <img src="/old-woman.jpeg" />
+              <div className="dashLayout__down-divv">
+                <h2>Vio D. Primadona</h2>
+                <p>UL Designer</p>
+                <p>Full time - Remote</p>
+                <p>103 tasks finished this month</p>
+              </div>
+            </div>
+
+            <div className="dashLayout__down-one">
+              <img src="/man.png" style={{ width: '200px'}} />
+              <div className="dashLayout__down-divv">
+                <h2>Opet Gaming</h2>
+                <p>UL Designer</p>
+                <p>Full time - Remote</p>
+                <p>103 tasks finished this month</p>
+              </div>
+            </div>
           </div>
-
         </main>
-
-
       </main>
       <main className="dashLayout__first-two">
-        <h1>Upcoming Schedule</h1>
+        <h1 className="dashLayout__sche">Upcoming Schedule</h1>
+
+        <Calendar
+          localizer={localizer}
+          events={events}
+          views={['month', 'work_week', 'agenda']}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: 500 }}
+        />
       </main>
     </section>
   );
