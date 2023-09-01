@@ -143,7 +143,6 @@ const DashLayout = ({ currentScreen }) => {
       </main>
       <main className="dashLayout__first-two">
         <h1 className="dashLayout__sche">Upcoming Schedule</h1>
-
         <Calendar
           localizer={localizer}
           events={events}
@@ -152,6 +151,13 @@ const DashLayout = ({ currentScreen }) => {
           endAccessor="end"
           style={{ height: 500 }}
         />
+
+        <h1>Working Type</h1>
+
+        <div className="">
+          <p>73%</p>
+        </div>
+
       </main>
     </section>
   );
