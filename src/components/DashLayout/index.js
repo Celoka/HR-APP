@@ -152,12 +152,32 @@ const DashLayout = ({ currentScreen }) => {
           style={{ height: 500 }}
         />
 
-        <h1>Working Type</h1>
+        <h1 className="dashLayout__work">Working Type</h1>
+        
+        <div className="dashLayout__circle-wrapper">
 
-        <div className="">
-          <p>73%</p>
+          <div className="dashLayout__circle">
+            <div className="dashLayout__circle-item">
+              <div className="dashLayout__circle-text"> 
+                <p className="dashLayout__circle-p">73%</p>
+                <p>(1028 people)</p>
+                <p>Working from</p>
+                <p>home</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="dashLayout__circle dashLayout__circle-second">
+            <div className="dashLayout__circle-item dashLayout__circle-third">
+              <div className="dashLayout__circle-text"> 
+                <p className="dashLayout__circle-p">73%</p>
+                <p>(1028 people)</p>
+                <p>Working from</p>
+                <p>home</p>
+              </div>
+            </div>
+          </div>
         </div>
-
       </main>
     </section>
   );
