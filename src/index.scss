@@ -40,3 +40,88 @@ ul,li ,p{
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+
+
+table {
+  width: 100%;
+  overflow: scroll;
+  &__table-list {
+    border-collapse: collapse;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  td,th {
+    padding: 20px;
+  }
+
+  tr {
+    background-color: #2B3035;
+    color: #ddd;
+  }
+
+  tr:hover {
+    background-color: #1B1E22;
+  }
+
+  th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #212529;
+    color: white;
+  }
+
+  &__button {
+    display:table-cell;
+    margin-right: 10px;
+  }
+
+  &__empty {
+    width: 100%;
+    margin: 0px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  &__total {
+    margin-top: 30px;
+    background-color: #2B3035;
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    width: fit-content;
+    align-items: initial;
+    h1 {
+      padding: 10px;
+    }
+  }
+
+  &__quan {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 10px
+  }
+
+  &__add {
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    font-size: 30px;
+    cursor: pointer;
+  }
+
+  &__add-icon {
+    color: green;
+  }
+
+  &__remove-icon {
+    color: red;
+  }
+}

@@ -1,18 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { UserDetails } from '../../Data';
 import DashboardSvg from '../../svg/Dashboard';
 import EmploySvg from '../../svg/Employee';
-import TaskSvg from '../../svg/Task';
 import DocSvg from '../../svg/DocSvg';
 import Account from '../../svg/Account';
 import SettingSvg from '../../svg/Setting';
+
 import './index.scss';
 
 const Sidebar = ({ setCurrentScreen }) => {
+  const user = useContext(UserDetails);
+  const { role } = user.userDetails;
+  
+  // console.log(role, 'role');
+
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [active, setActive] = useState('dashboard');
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
   };
+
+  const roleCheck = {
+    super_admin: ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
+    superAdmin: ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
+    superadmin: ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
+    admin: ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
+    manager: ['Employee', 'Documents', 'Account', 'Setting'],
+    staff: ['Documents', 'Account', 'Setting'],
+  };
+
   return (
     <section className="sidebar">
       <button
@@ -20,77 +36,90 @@ const Sidebar = ({ setCurrentScreen }) => {
         onClick={toggleSidebar}
       >
         <h1 className="sidebar__title">HR</h1>
-        {/* <div>
-          <i className={`fa ${sidebarVisible ? 'fa-times' : 'fa-bars'}`}></i>
-        </div> */}
       </button>
       <ul className="sidebar__ul">
-        <li 
-          className={`sidebar__li ${active === "dashboard" ? "sidebar__li-active" : " "}`}
-          onClick={() => {
+        {
+          roleCheck[role.toLowerCase()]?.includes('Dashboard') && (
+            <li 
+              className={`sidebar__li ${active === "dashboard" ? "sidebar__li-active" : " "}`}
+              onClick={() => {
               setActive('dashboard');
               setCurrentScreen('Dashboard');
             }
-          }
-        >
-            <DashboardSvg active={active} />
-            Dashboard
-        </li>
-        <li 
-          className={`sidebar__li ${active === "employment" ? "sidebar__li-active" : " "}`}
-          onClick={() => {
-              setActive('employment')
-              setCurrentScreen('Employment');
-            }
-          }
-        >
-            <EmploySvg active={active} />
-            Employment
-        </li>
-        <li 
-          className={`sidebar__li ${active === "task" ? "sidebar__li-active" : " "}`}
-          onClick={() => {
-              setActive('task')
-              setCurrentScreen('Tasks');
-              }
             }
           >
-            <TaskSvg active={active} />
-            Tasks
-        </li>
-        <li 
-          className={`sidebar__li ${active === "document" ? "sidebar__li-active" : " "}`}
-          onClick={() => {
-              setActive('document')
-              setCurrentScreen('Documents');
-            }
+              <DashboardSvg active={active} />
+              Dashboard
+          </li>
+            )
           }
-        >
-            <DocSvg active={active} />
-            Documents
-        </li>
-        <li 
-          className={`sidebar__li ${active === "account" ? "sidebar__li-active" : " "}`}
-          onClick={() => {
-            setActive('account')
-            setCurrentScreen('Account');
-            }
+          {
+            roleCheck[role.toLowerCase()]?.includes('Employee') &&
+            (
+              <li 
+                className={`sidebar__li ${active === "employee" ? "sidebar__li-active" : " "}`}
+                onClick={() => {
+                    setActive('employee')
+                    setCurrentScreen('Employee');
+                  }
+                }
+              >
+                <EmploySvg active={active} />
+                Employee
+            </li>
+            )
           }
-        >
-            <Account active={active} />
-            Account
-        </li>
-        <li 
-          className={`sidebar__li ${active === "setting" ? "sidebar__li-active" : " "}`}
-          onClick={() => {
-            setActive('setting')
-            setCurrentScreen('Setting');
-            }
+          {
+            roleCheck[role.toLowerCase()]?.includes('Documents') && 
+            (
+              <li 
+                className={`sidebar__li ${active === "document" ? "sidebar__li-active" : " "}`}
+                onClick={() => {
+                    setActive('document')
+                    setCurrentScreen('Documents');
+                  }
+                }
+              >
+                <DocSvg active={active} />
+                Documents
+            </li>
+            )
           }
-        >
-          <SettingSvg active={active} />
-            Setting
-        </li>
+
+          {
+            roleCheck[role.toLowerCase()]?.includes('Documents') && 
+            (
+              <li 
+                className={`sidebar__li ${active === "account" ? "sidebar__li-active" : " "}`}
+                onClick={() => {
+                  setActive('account')
+                  setCurrentScreen('Account');
+                  }
+                }
+              >
+                <Account active={active} />
+                Account
+            </li>
+            )
+          }
+
+          
+          {
+            roleCheck[role.toLowerCase()].includes('Documents') && 
+            (
+              <li 
+                className={`sidebar__li ${active === "setting" ? "sidebar__li-active" : " "}`}
+                onClick={() => {
+                  setActive('setting')
+                  setCurrentScreen('Setting');
+                  }
+                }
+              >
+                <SettingSvg active={active} />
+                Setting
+              </li>
+            )
+          }
       </ul>
     </section>
   )

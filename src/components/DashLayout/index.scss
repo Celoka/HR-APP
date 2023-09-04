@@ -252,4 +252,47 @@
     height: 190px;
     background-color: #46C5EA;
   }
+
+  &__employ {
+    padding: 20px;
+    margin: 50px auto;
+  }
+
+  &__employ-title {
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  &__account {
+    margin: 100px auto;
+    display: flex;
+    width: 60%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__form {
+    width: 100%;
+    input {
+      padding: 20px;
+      font-size: 30px;
+    }
+    label {
+      font-size: 30px;
+      font-weight: bold;
+    }
+  }
+
+  &__document {
+    display: flex;
+    margin: 100px auto;
+    width:80%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    button {
+      color: #000;
+    }
+  }
 }
