@@ -11,9 +11,6 @@ import './index.scss';
 const Sidebar = ({ setCurrentScreen }) => {
   const user = useContext(UserDetails);
   const { role } = user.userDetails;
-  
-  // console.log(role, 'role');
-
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [active, setActive] = useState('dashboard');
   const toggleSidebar = () => {
