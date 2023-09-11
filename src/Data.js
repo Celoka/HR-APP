@@ -15,6 +15,18 @@ export const postData = async (data, url) => {
   return response.json();
 };
 
+
+export const getData = async (url) => {
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  const response = await fetch(`${baseUrlLink}/${url}`, options);
+  return response.json();
+};
+
 export const toastProperty = {
   duration: 8000,
   newWindow: true,

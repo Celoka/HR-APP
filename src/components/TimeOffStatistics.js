@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
-const TimeOffStatistics = () => {
+const TimeOffStatistics = ({ data }) => {
   const [chartType, setChartType] = useState('month');
   const chartRef = useRef(null);
 
@@ -90,11 +90,6 @@ const TimeOffStatistics = () => {
       <div className="chart-container">
         <canvas id="timeOffChart"></canvas>
       </div>
-      {/* <div className="chart-toggle">
-        <button onClick={() => handleChartTypeChange('month')}>Month</button>
-        <button onClick={() => handleChartTypeChange('week')}>Week</button>
-        <button onClick={() => handleChartTypeChange('year')}>Year</button>
-      </div> */}
     </div>
   );
 };

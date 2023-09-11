@@ -17,7 +17,8 @@ const ProtectedRoute = ({ tokenItem, children }) => {
   return children;
 };
 
-const UnProtectedRoute = ({ tokenItem, children }) => {
+const UnProtectedRoute = ({ tokenItem, children, user }) => {
+  console.log(user, 'user user')
   if (tokenItem) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -36,6 +37,7 @@ const App = () => {
       setTokenItem(token);
     };
   }, []);
+
   const value = {
     setUserDetails: setUserDetails,
     userDetails: userDetails,
@@ -49,7 +51,7 @@ const App = () => {
         <Routes>
           <Route path="/" 
             element={
-            <UnProtectedRoute tokenItem={tokenItem}>
+            <UnProtectedRoute tokenItem={tokenItem} user={userDetails}>
               <Login />
             </UnProtectedRoute>
             }

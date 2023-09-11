@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { UserDetails } from '../../Data';
 import DashboardSvg from '../../svg/Dashboard';
 import EmploySvg from '../../svg/Employee';
@@ -18,13 +18,17 @@ const Sidebar = ({ setCurrentScreen }) => {
   };
 
   const roleCheck = {
-    super_admin: ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
-    superAdmin: ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
-    superadmin: ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
+    "super admin": ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
     admin: ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
     manager: ['Employee', 'Documents', 'Account', 'Setting'],
     staff: ['Documents', 'Account', 'Setting'],
   };
+
+  useEffect(() => {
+    const checkRole = role === 'Super admin' ? 'Dashboard' : 'Account';
+    setActive(checkRole.toLowerCase())
+    setCurrentScreen(checkRole)
+  }, []);
 
   return (
     <section className="sidebar">

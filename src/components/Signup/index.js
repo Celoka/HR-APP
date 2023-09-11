@@ -27,10 +27,10 @@ const Signup = () => {
     })
   };
 
-  const mutation = useMutation((data) => postData(data, 'user/'), {
+  const mutation = useMutation((data) => postData(data, 'user/create'), {
     onSuccess: (res) => {
       console.log(res, 'ress');
-      if(res.msg) {
+      if(res.msg !== "OK") {
         Toastify({
           text: "Email used already",
           ...toastProperty,

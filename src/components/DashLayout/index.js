@@ -2,12 +2,22 @@ import React, { useContext, useState } from 'react';
 import moment from 'moment';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Table from 'react-bootstrap/Table';
 import { useNavigate } from "react-router-dom";
 import Toastify from 'toastify-js';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
-import { UserDetails, toastProperty, success } from '../../Data';
 import TimeOffStatistics from '../TimeOffStatistics';
 import Card from 'react-bootstrap/Card';
+import { useQuery, useMutation } from 'react-query';
+import Modal from 'react-bootstrap/Modal';
+
+import { 
+  postData, 
+  getData,
+  toastProperty, 
+  success, 
+  UserDetails 
+} from '../../Data';
 
 import './index.scss';
 
@@ -46,90 +56,16 @@ const docLinks = [
   },
 ];
 
-const analytics = [
-  {
-    name: 'Total employees',
-    total: 1409,
-    per: '23%',
-    summary: '13 applications need review'
-  },
-  {
-    name: 'Total overtime',
-    total: 569,
-    per: '13%',
-    summary: '103 overtime schedules need approval'
-  },
-  {
-    name: 'Total leave',
-    total: 103,
-    per: '3%',
-    summary: '98 paid leave plans needs approval'
-  },
-];
-
-
-const employees = [
-  {
-    name: 'John Doe',
-    totalLeave: 21,
-    leaveTaken: 10,
-    leaveLeft: 11,
-    request: 3,
-    status: 'Approved',
-  },
-  {
-    name: 'John Doe',
-    totalLeave: 21,
-    leaveTaken: 10,
-    leaveLeft: 11,
-    request: 3,
-    status: 'Pending',
-  },
-  {
-    name: 'John Doe',
-    totalLeave: 21,
-    leaveTaken: 10,
-    leaveLeft: 11,
-    request: 3,
-    status: 'Declined',
-  },
-  {
-    name: 'John Doe',
-    totalLeave: 21,
-    leaveTaken: 10,
-    leaveLeft: 11,
-    request: 3,
-    status: 'Approved',
-  },
-  {
-    name: 'John Doe',
-    totalLeave: 21,
-    leaveTaken: 10,
-    leaveLeft: 11,
-    request: 3,
-    status: 'Approved',
-  },
-  {
-    name: 'John Doe',
-    totalLeave: 21,
-    leaveTaken: 10,
-    leaveLeft: 11,
-    request: 3,
-    status: 'Approved',
-  },
-  {
-    name: 'John Doe',
-    totalLeave: 21,
-    leaveTaken: 10,
-    leaveLeft: 11,
-    request: 3,
-    status: 'Approved',
-  }
-]
 
 const DashLayout = ({ currentScreen }) => {
   const user = useContext(UserDetails);
   const navigate = useNavigate();
+  const [show, setShow] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState({});
+  const { isLoading, isError, data, error }  = useQuery('totalData', () => getData('stats/'));
+  const userList = useQuery('userList', () => getData('user/admin/all-users'));
+  const users_status = userList?.data?.payload?.users_status;
+  const [selectManagerData, setSelectManagerData] = useState({});
 
   const handleLogout = () => {
     Toastify({
@@ -167,6 +103,13 @@ const DashLayout = ({ currentScreen }) => {
     console.log(value)
   }
 
+  const handleClose = () => {
+    setShow(false);
+    setSelectedStaff({})
+  };
+
+  const handleShow = () => setShow(true);
+
   const DashboardContent = () => (
     <section className="dashLayout__first">
       <main className="dashLayout__first-main">
@@ -177,24 +120,58 @@ const DashLayout = ({ currentScreen }) => {
           < button className="dashLayout__button">Export Data</button>
         </div>
         <div className="dashLayout__items">
-          {
-            analytics.map((analytic, index) => (
-              <div  className="dashLayout__item" key={index}>
-                <div className="dashLayout__item-cover">
-                  <p>{analytic.name}</p>
-                  <div className="dashLayout__item-content">
-                    <h1>{analytic.total}</h1>
-                    <p>{analytic.per}</p>
-                  </div>
-                </div>
-                <div className="dashLayout__item-descr">
-                  <p>
-                    {analytic.summary}
-                  </p>
+          <div  className="dashLayout__item">
+            <div className="dashLayout__item-cover">
+              <p>Total employees</p>
+              <div className="dashLayout__item-content">
+                <h1>{data?.payload?.total_employees}</h1>
+                <p>23%</p>
+              </div>
+            </div>
+              <div className="dashLayout__item-descr">
+                <p>13 applications need review</p>
+              </div>
+            </div>
+
+            <div  className="dashLayout__item">
+            <div className="dashLayout__item-cover">
+              <p>Total Leave Application</p>
+              <div className="dashLayout__item-content">
+                <h1>{data?.payload?.total_leave_applications}</h1>
+                <p>30%</p>
+              </div>
+            </div>
+              <div className="dashLayout__item-descr">
+                <p>98 leave application</p>
+              </div>
+            </div>
+
+            <div  className="dashLayout__item">
+              <div className="dashLayout__item-cover">
+                <p>Total Paid Leave</p>
+                <div className="dashLayout__item-content">
+                  <h1>{data?.payload?.total_paid_leave}</h1>
+                  <p>3%</p>
                 </div>
               </div>
-            ))
-          }
+              <div className="dashLayout__item-descr">
+                <p>80 paid leave approved</p>
+              </div>
+            </div>
+
+            <div  className="dashLayout__item">
+              <div className="dashLayout__item-cover">
+                <p>Total Pending Application</p>
+                <div className="dashLayout__item-content">
+                  <h1>{data?.payload?.total_pending_applications}</h1>
+                  <p>23%</p>
+                </div>
+              </div>
+              <div className="dashLayout__item-descr">
+                <p>50 pending application approval</p>
+              </div>
+            </div>
+
         </div>
 
         <main className="dashLayout__down">
@@ -215,30 +192,7 @@ const DashLayout = ({ currentScreen }) => {
                 <p>Unpaid leave</p>
               </span>
             </div>
-            <TimeOffStatistics />
-          </div>
-
-          <div className="dashLayout__down-div2">
-            <h1  className="dashLayout__down-h1">Employee Ranks</h1>
-            <div className="dashLayout__down-one">
-              <img src="/old-woman.jpeg" />
-              <div className="dashLayout__down-divv">
-                <h2>Vio D. Primadona</h2>
-                <p>UL Designer</p>
-                <p>Full time - Remote</p>
-                <p>103 tasks finished this month</p>
-              </div>
-            </div>
-
-            <div className="dashLayout__down-one">
-              <img src="/man.png" style={{ width: '200px'}} />
-              <div className="dashLayout__down-divv">
-                <h2>Opet Gaming</h2>
-                <p>UL Designer</p>
-                <p>Full time - Remote</p>
-                <p>103 tasks finished this month</p>
-              </div>
-            </div>
+            <TimeOffStatistics data={data} />
           </div>
         </main>
       </main>
@@ -252,90 +206,94 @@ const DashLayout = ({ currentScreen }) => {
           endAccessor="end"
           style={{ height: 500 }}
         />
-
-        <h1 className="dashLayout__work">Working Type</h1>
-        
-        <div className="dashLayout__circle-wrapper">
-
-          <div className="dashLayout__circle">
-            <div className="dashLayout__circle-item">
-              <div className="dashLayout__circle-text"> 
-                <p className="dashLayout__circle-p">73%</p>
-                <p>(1028 people)</p>
-                <p>Working from</p>
-                <p>home</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="dashLayout__circle dashLayout__circle-second">
-            <div className="dashLayout__circle-item dashLayout__circle-third">
-              <div className="dashLayout__circle-text"> 
-                <p className="dashLayout__circle-p">73%</p>
-                <p>(1028 people)</p>
-                <p>Working from</p>
-                <p>home</p>
-              </div>
-            </div>
-          </div>
-        </div>
       </main>
     </section>
   );
 
   const { firstName, lastName, emailAddress, role } = user.userDetails;
 
+  const mutation = useMutation((data) => postData(data, 'user/assign-manager'), {
+    onSuccess: (res) => {
+      if(res.msg === 'User does not exist') {
+        Toastify({
+          text: res.msg,
+          ...toastProperty,
+          style: error,
+        }).showToast();
+      }
+      else {
+        Toastify({
+          text: "Manager assigned successfully",
+          ...toastProperty,
+          style: success,
+        }).showToast();
+      }
+    },
+  });
+
+  const handleAddManager = () => {
+    const data = {
+      subordinateId: selectedStaff.id,
+      managerId: Number(selectManagerData),
+      superAdminId: user?.userDetails.id,
+    };
+    mutation.mutate(data);
+    handleClose();
+  };
+
+
   const EmployeeScreen = () => {
     return (
       <div className="dashLayout__employ">
         <h1 className="dashLayout__employ-title">Employee List</h1>
         <div>
-          <table className="table__table-list">
+          <Table striped bordered hover size="lg">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Total Leave</th>
-                <th>Leave Left</th>
-                <th>Leave Taken</th>
-                <th>Leave Request</th>
+                <th>#Id</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Event Type</th>
+                <th>Leave Start</th>
+                <th>Leave End</th>
+                <th>Leave Reason</th>
                 <th>Status</th>
+                <th>Assign a Manager</th>
               </tr>
             </thead>
             <tbody>
               {
-                employees?.map((employee, index) => {
-                  return (
-                    <tr key={index}>
-                      <td>{employee.name}</td>
-                      <td>
-                        <div className="table__quan">
-                            {employee.totalLeave}
-                        </div>
-                      </td>
-                      <td>{employee.leaveLeft}</td>
-                      <td>{employee.leaveTaken}</td>
-                      <td>{employee.request}</td>
-                      <td>
-                        <div className="table__quan">
-                          <button 
-                            className="table__add table__remove-icon"
-                            onClick={() => handleApproval(employee.status)}
-                          >
-                            {employee.status}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })
+                users_status?.map((employee, index) => (
+                  <tr key={index}>
+                    <td>{employee.id}</td>
+                    <td>{`${employee.firstName} ${employee.lastName}`}</td>
+                    <td>{employee.emailAddress}</td>
+                    <td>{employee.eventType}</td>
+                    <td>{new Date(employee.leaveStart).toISOString().slice(0, 10)}</td>
+                    <td>{new Date(employee.leaveEnd).toISOString().slice(0, 10)}</td>
+                    <td>{employee.reason}</td>
+                    <td>{employee.status}</td>
+                    <td>
+                    <Button 
+                      variant="outline-primary" 
+                      onClick={() => {
+                          setSelectedStaff(employee)
+                          handleShow()
+                        }
+                      }
+                    >
+                      Open
+                    </Button>
+                    </td>
+                  </tr>
+                ))
               }
-            </tbody>
-          </table>
+          </tbody>
+        </Table>
         </div>
       </div>
     )
   }
-
 
   const AccountScreen = () => (
     <div className="dashLayout__account">
@@ -359,7 +317,6 @@ const DashLayout = ({ currentScreen }) => {
             className="dashLayout__form-item"
           />
         </Form.Group>
-
         <Form.Group className="mb-3" controlId="formBasicPassword">
           <Form.Label>Role</Form.Label>
           <Form.Control type="text" placeholder={role} disabled className="dashLayout__form-item"/>
@@ -373,7 +330,7 @@ const DashLayout = ({ currentScreen }) => {
   const DocumentScreen = () => (
     <div className="dashLayout__document">
       {
-        docLinks.map((docLink) => (
+        docLinks?.map((docLink) => (
           <Card style={{ width: '18rem',     padding: '20px', marginBottom: '20px' }} key={docLink}>
             <Card.Img variant="top" src="https://res.cloudinary.com/skybound/image/upload/v1693863186/document-svgrepo-com.png"/>
             <Card.Body>
@@ -417,6 +374,55 @@ const DashLayout = ({ currentScreen }) => {
         </div>
       </div>
         {screenObject[currentScreen]}
+        <Modal show={show} onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Assign Manager</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Form.Label>Staff Email address</Form.Label>
+              <Form.Control size="lg" type="text" readOnly placeholder={selectedStaff?.emailAddress} />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+              <Form.Label>Staff Full Name</Form.Label>
+              <Form.Control 
+                size="lg" type="text" readOnly rows={3}
+                placeholder={`${selectedStaff?.firstName} ${selectedStaff?.lastName}` }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+              <Form.Label>Super admin Full Name</Form.Label>
+              <Form.Control 
+                type="text" 
+                size="lg"
+                rows={3} 
+                placeholder={`${user?.userDetails.firstName} ${user?.userDetails.lastName}`}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+              <Form.Label>Select Manager</Form.Label>
+              <Form.Select 
+                size="lg" 
+                onChange={(e) => setSelectManagerData(e.target.value) }
+              >
+                <option>Select from dropdown</option>
+                {
+                  users_status?.map((user) => <option value={user.id}>{`${user.firstName} ${user.lastName}`}</option>)
+                }
+            </Form.Select>
+            </Form.Group>
+          </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-secondary" onClick={handleClose}>
+              Close
+            </Button>
+            <Button variant="outline-primary" onClick={handleAddManager}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
     </div>
   )
 };
