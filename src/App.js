@@ -18,7 +18,6 @@ const ProtectedRoute = ({ tokenItem, children }) => {
 };
 
 const UnProtectedRoute = ({ tokenItem, children, user }) => {
-  console.log(user, 'user user')
   if (tokenItem) {
     return <Navigate to="/dashboard" replace />;
   }

@@ -10,6 +10,9 @@ import TimeOffStatistics from '../TimeOffStatistics';
 import Card from 'react-bootstrap/Card';
 import { useQuery, useMutation } from 'react-query';
 import Modal from 'react-bootstrap/Modal';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 
 import { 
   postData, 
@@ -56,16 +59,25 @@ const docLinks = [
   },
 ];
 
-
 const DashLayout = ({ currentScreen }) => {
   const user = useContext(UserDetails);
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState({});
-  const { isLoading, isError, data, error }  = useQuery('totalData', () => getData('stats/'));
+  const { data, error }  = useQuery('totalData', () => getData('stats/'));
+  const [applyLeaveForm, setApplyLeaveForm] = useState({
+    leaveStart: '' , 
+    leaveEnd: '',
+    eventType: '',
+    description:  '',
+  })
+  const [showLeaveModalApproval, setShowLeaveModalApproval] = useState(false);
   const userList = useQuery('userList', () => getData('user/admin/all-users'));
-  const users_status = userList?.data?.payload?.users_status;
+  const leaveQuestList = useQuery('leaveRequest', () => getData(`leave-request/requests/${user?.userDetails?.id}`));
+  const users_status = userList?.data?.payload?.users;
   const [selectManagerData, setSelectManagerData] = useState({});
+  const [addReason, setAddReason] = useState('');
 
   const handleLogout = () => {
     Toastify({
@@ -101,11 +113,45 @@ const DashLayout = ({ currentScreen }) => {
 
   const handleApproval = (value) => {
     console.log(value)
-  }
+  };
 
   const handleClose = () => {
     setShow(false);
     setSelectedStaff({})
+  };
+
+  const mutationSubmitLeaveRequest = useMutation((data) => postData(data, 'leave-request/update'), {
+    onSuccess: (res) => {
+      setShowLeaveModalApproval(false);
+      Toastify({
+        text: res.msg,
+        ...toastProperty,
+        style: success,
+      }).showToast();
+    },
+  });
+
+  const mutationLeaveRequest = useMutation((data) => postData(data, 'leave-request/create'), {
+    onSuccess: (res) => {
+      setApplyLeaveForm({})
+      Toastify({
+        text: res.msg,
+        ...toastProperty,
+        style: success,
+      }).showToast();
+    },
+  });
+
+  const handleLeaveApproval = (leaveList, status) => {
+    console.log(selectedStaff, 'leaveList')
+    const data = {
+      userId: selectedStaff.id ,
+      managerId: '<the manager id>',
+      leaveRequestId: leaveList.id,
+      status: status,
+      reason: addReason,
+    };
+    //mutationSubmitLeaveRequest.mutate(data);
   };
 
   const handleShow = () => setShow(true);
@@ -231,6 +277,8 @@ const DashLayout = ({ currentScreen }) => {
     },
   });
 
+  const leaveListData = leaveQuestList.data?.payload?.leave_requests;
+
   const handleAddManager = () => {
     const data = {
       subordinateId: selectedStaff.id,
@@ -241,88 +289,214 @@ const DashLayout = ({ currentScreen }) => {
     handleClose();
   };
 
-
   const EmployeeScreen = () => {
     return (
-      <div className="dashLayout__employ">
-        <h1 className="dashLayout__employ-title">Employee List</h1>
-        <div>
-          <Table striped bordered hover size="lg">
-            <thead>
-              <tr>
-                <th>#Id</th>
-                <th>Full Name</th>
-                <th>Email Address</th>
-                <th>Event Type</th>
-                <th>Leave Start</th>
-                <th>Leave End</th>
-                <th>Leave Reason</th>
-                <th>Status</th>
-                <th>Assign a Manager</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                users_status?.map((employee, index) => (
-                  <tr key={index}>
-                    <td>{employee.id}</td>
-                    <td>{`${employee.firstName} ${employee.lastName}`}</td>
-                    <td>{employee.emailAddress}</td>
-                    <td>{employee.eventType}</td>
-                    <td>{new Date(employee.leaveStart).toISOString().slice(0, 10)}</td>
-                    <td>{new Date(employee.leaveEnd).toISOString().slice(0, 10)}</td>
-                    <td>{employee.reason}</td>
-                    <td>{employee.status}</td>
-                    <td>
-                    <Button 
-                      variant="outline-primary" 
-                      onClick={() => {
-                          setSelectedStaff(employee)
-                          handleShow()
-                        }
-                      }
-                    >
-                      Open
-                    </Button>
-                    </td>
+      <div className="dashLayout__account-tab">
+        <Tabs
+          defaultActiveKey="home"
+          id="uncontrolled-tab-example"
+          className="mb-3"
+        >
+        <Tab eventKey="home" title="Employee List">
+          <div className="dashLayout__employ">
+            <h1 className="dashLayout__employ-title">Employee List</h1>
+            <div>
+              <Table striped bordered hover size="lg">
+                <thead>
+                  <tr>
+                    <th>#Id</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Manager</th>
+                    <th>View leaves</th>
+                    {
+                      user.userDetails.role === 'Super admin' 
+                      ? (<th>Assign a Manager</th>) 
+                      : null
+                    }
                   </tr>
-                ))
-              }
-          </tbody>
-        </Table>
-        </div>
-      </div>
+                </thead>
+                <tbody>
+                  {
+                    users_status?.map((employee, index) => (
+                      <tr key={index}>
+                        <td>{employee.id}</td>
+                        <td>{`${employee.firstName} ${employee.lastName}`}</td>
+                        <td>{employee.emailAddress}</td>
+                        <td>{employee.managerName == null ? 'Not assigned' : employee.managerName}</td>
+                        <td>
+                          {
+                            employee.leave_requests.length === 0
+                            ? 'No leave application'
+                            : (
+                              <Button
+                              variant="outline-primary" 
+                              onClick={() => {
+                                setSelectedStaff(employee)
+                                setShowLeaveModal(true)
+                              }
+                            }
+                            >
+                              View Leaves
+                              </Button>
+                            )
+                          }
+                        </td>
+                        {
+                          user.userDetails.role === 'Super admin' 
+                          ? (
+                            <td>
+                            <Button 
+                            variant="outline-primary" 
+                            onClick={() => {
+                                setSelectedStaff(employee)
+                                handleShow()
+                                }
+                              }
+                            >
+                            Open
+                            </Button>
+                          </td>
+                          ): null
+                        }
+                      </tr>
+                    ))
+                  }
+              </tbody>
+            </Table>
+            </div>
+          </div>
+        </Tab>
+        <Tab eventKey="profile" title="Pending Leave Application">
+        <div className="dashLayout__employ">
+            <h1 className="dashLayout__employ-title">Pending Employee Leave List</h1>
+            <div>
+              <Table striped bordered hover size="lg">
+                <thead>
+                  <tr>
+                    <th>#Id</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    users_status?.filter((employee) => employee.managerName != null).map((employee, index) => (
+                      <tr key={index}>
+                        <td>{employee.id}</td>
+                        <td>{`${employee.firstName} ${employee.lastName}`}</td>
+                        <td>{employee.emailAddress}</td>
+                        <td>
+                          {
+                            employee.leave_requests.length === 0
+                            ? 'No leave application'
+                            : (
+                              <Button
+                              variant="outline-primary" 
+                              onClick={() => {
+                                setSelectedStaff(employee)
+                                setShowLeaveModalApproval(true)
+                              }
+                            }
+                            >
+                              View Leaves
+                              </Button>
+                            )
+                          }
+                        </td>
+                      </tr>
+                    ))
+                  }
+              </tbody>
+            </Table>
+            </div>
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
     )
-  }
+  };
 
   const AccountScreen = () => (
-    <div className="dashLayout__account">
-      <Form className="dashLayout__form">
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control 
-            type="email" 
-            placeholder={emailAddress} 
-            disabled 
-            className="dashLayout__form-item"
-          />
-        </Form.Group>
+    <div className="dashLayout__account-tab">
+    <Tabs
+        defaultActiveKey="profile"
+        id="uncontrolled-tab-example"
+        className="mb-3"
+      >
+    <Tab eventKey="home" title="Profile">
+      <div className="dashLayout__account">
+        <Form className="dashLayout__form">
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Email address</Form.Label>
+            <Form.Control 
+              type="email" 
+              placeholder={emailAddress} 
+              disabled 
+              className="dashLayout__form-item"
+              size="sm"
+            />
+          </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Full name</Form.Label>
-          <Form.Control 
-            type="text" 
-            placeholder={`${firstName} ${lastName}`} 
-            disabled 
-            className="dashLayout__form-item"
-          />
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Role</Form.Label>
-          <Form.Control type="text" placeholder={role} disabled className="dashLayout__form-item"/>
-        </Form.Group>
-      </Form>
-    </div>
+          <Form.Group className="mb-3" controlId="formBasicPassword">
+            <Form.Label>Full name</Form.Label>
+            <Form.Control 
+              type="text" 
+              placeholder={`${firstName} ${lastName}`} 
+              disabled 
+              className="dashLayout__form-item"
+              size="sm"
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="formBasicPassword">
+            <Form.Label>Role</Form.Label>
+            <Form.Control  
+              size="sm" 
+              type="text" 
+              placeholder={role} 
+              disabled 
+              className="dashLayout__form-item"
+            />
+          </Form.Group>
+        </Form>
+        <div>
+        </div>
+      </div>
+    </Tab>
+    <Tab eventKey="profile" title="My Leave">
+      <Table striped bordered hover size="lg">
+        <thead>
+          <tr>
+            <th>#Id</th>
+            <th>Event Type</th>
+            <th>Leave Start</th>
+            <th>Leave End</th>
+            <th>Status</th>
+            <th>Description</th>
+            <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              leaveListData?.map((leaveList, index) => (
+                  <tr key={index}>
+                    <td>{leaveList.id}</td>
+                    <td>{leaveList.eventType}</td>
+                    <td>{leaveList.leaveStart}</td>
+                    <td>{leaveList.leaveEnd}</td>
+                    <td>{leaveList.status}</td>
+                    <td>{leaveList.description}</td>
+                    <td>{leaveList.reason}</td>
+                  </tr>
+                )
+              )
+            }
+          </tbody>
+        </Table>
+      </Tab>
+    </Tabs>
+  </div>
+
   );
 
   const downloadFile = (link) => window.location.href = link;
@@ -351,12 +525,29 @@ const DashLayout = ({ currentScreen }) => {
     </div>
 
   );
+    console.log(selectedStaff, 'selectedStaff');
+  const handleApplyLeave = () => {
+    const data = {
+      userId: user.userDetails.id,
+      ...applyLeaveForm
+    };
+    mutationLeaveRequest.mutate(data);
+  };
+
+  const leaveType = [
+    'Holiday', 
+    'Time off', 
+    'Sick leave', 
+    'Maternity leave',
+    'Paternity leave', 
+    'Training day'
+  ];
 
   const screenObject = {
     Dashboard: <DashboardContent />,
     Employee: <EmployeeScreen />,
     Account: <AccountScreen />,
-    Documents: <DocumentScreen />
+    Documents: <DocumentScreen />,
   };
 
   return (
@@ -408,7 +599,7 @@ const DashLayout = ({ currentScreen }) => {
               >
                 <option>Select from dropdown</option>
                 {
-                  users_status?.map((user) => <option value={user.id}>{`${user.firstName} ${user.lastName}`}</option>)
+                  users_status?.map((user, index) => <option key={index} value={user.id}>{`${user.firstName} ${user.lastName}`}</option>)
                 }
             </Form.Select>
             </Form.Group>
@@ -420,6 +611,158 @@ const DashLayout = ({ currentScreen }) => {
             </Button>
             <Button variant="outline-primary" onClick={handleAddManager}>
               Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        {
+          currentScreen === 'Setting' && (
+            <div className="dashLayout__setting">
+            <h1 className="dashLayout__setting-h1">Apply for leave</h1>
+            <Form style={{ width: "100%"}}>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                <Form.Label style={{ fontWeight: 'Bold' }}>Leave Start date</Form.Label>
+                <Form.Control 
+                  type="date" 
+                  placeholder="" 
+                  name="leaveStart"
+                  onChange={(e) => setApplyLeaveForm({
+                    ...applyLeaveForm,
+                    leaveStart: e.target.value
+                  }) }
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                <Form.Label style={{ fontWeight: 'Bold' }}>Leave End date</Form.Label>
+                <Form.Control 
+                  type="date" 
+                  placeholder="" 
+                  name="leaveEnd"
+                  onChange={(e) => setApplyLeaveForm({
+                    ...applyLeaveForm,
+                    leaveEnd: e.target.value
+                  }) }
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+              <Form.Label style={{ fontWeight: 'Bold' }} >Event Type</Form.Label>
+              <Form.Select 
+                size="lg" 
+                name="eventType"
+                onChange={(e) => setApplyLeaveForm({
+                  ...applyLeaveForm,
+                  eventType: e.target.value
+                }) }
+              >
+                <option>Select from dropdown</option>
+                  {
+                    leaveType.map((type, index) => <option key={index} value={type}>{type}</option>)
+                  }
+              </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                <Form.Label style={{ fontWeight: 'Bold' }}>Description</Form.Label>
+                <Form.Control 
+                  type="text" 
+                  placeholder="" 
+                  name="description"
+                  onChange={(e) => setApplyLeaveForm({
+                    ...applyLeaveForm,
+                    description: e.target.value
+                  }) }
+                />
+              </Form.Group>
+            </Form>
+            <div className="dashLayout__submit-button">
+              <Button 
+                variant="outline-primary" 
+                onClick={handleApplyLeave}
+              >
+              Submit
+            </Button>
+            </div>
+          </div>
+          ) 
+        }
+        <Modal show={showLeaveModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>View Leaves</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <ListGroup>
+            {
+              selectedStaff.leave_requests
+              ?.map((leaveList) => (
+                <>
+                  <ListGroup.Item>{leaveList.eventType}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.isPaidLeave}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.leaveStart}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.leaveEnd}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.status}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.description}</ListGroup.Item>
+                </>
+              ))
+            }
+          </ListGroup>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-secondary" onClick={() => setShowLeaveModal(false)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal show={showLeaveModalApproval}>
+          <Modal.Header closeButton>
+            <Modal.Title>Approve or Reject Leaves</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <ListGroup>
+            {
+              selectedStaff?.leave_requests?.filter((request) => request.status === 'Pending')?.map((leaveList) => (
+                <>
+                  <ListGroup.Item>{leaveList.eventType}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.isPaidLeave}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.leaveStart}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.leaveEnd}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.status}</ListGroup.Item>
+                  <ListGroup.Item>{leaveList.description}</ListGroup.Item>
+                  <ListGroup.Item> 
+                  <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                    <Form.Label style={{ fontWeight: 'Bold' }}>Add Reason</Form.Label>
+                  <Form.Control 
+                    type="text" 
+                    placeholder="Add Reason" 
+                    name="reason"
+                    onChange={(e) => setAddReason(e.target.value)}
+                  />
+                  </Form.Group>
+                  <div className="dashLayout__add-reason">
+                    <Button 
+                      variant="outline-primary"
+                      onClick={() =>handleLeaveApproval(leaveList, 'Approve')}
+                      disabled={addReason.length === 0}
+                    >
+                      Approve
+                    </Button>
+                    <Button 
+                      variant="outline-danger"
+                      onClick={() => handleLeaveApproval(leaveList, 'Reject')}
+                      disabled={addReason.length === 0}
+                    >
+                      Reject
+                    </Button>
+                  </div>
+                  
+                  </ListGroup.Item>
+                  <br />
+                </>
+              ))
+            }
+          </ListGroup>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-secondary" onClick={() => setShowLeaveModalApproval(false)}>
+              Done
             </Button>
           </Modal.Footer>
         </Modal>

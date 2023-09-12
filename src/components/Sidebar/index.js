@@ -19,8 +19,8 @@ const Sidebar = ({ setCurrentScreen }) => {
 
   const roleCheck = {
     "super admin": ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
-    admin: ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
-    manager: ['Employee', 'Documents', 'Account', 'Setting'],
+    admin: ['Documents', 'Account', 'Setting', 'Employee'],
+    manager: ['Documents', 'Account', 'Setting',],
     staff: ['Documents', 'Account', 'Setting'],
   };
 
