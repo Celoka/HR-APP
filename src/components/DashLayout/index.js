@@ -19,7 +19,8 @@ import {
   getData,
   toastProperty, 
   success, 
-  UserDetails 
+  UserDetails,
+  putData
 } from '../../Data';
 
 import './index.scss';
@@ -76,6 +77,7 @@ const DashLayout = ({ currentScreen }) => {
   const userList = useQuery('userList', () => getData('user/admin/all-users'));
   const leaveQuestList = useQuery('leaveRequest', () => getData(`leave-request/requests/${user?.userDetails?.id}`));
   const users_status = userList?.data?.payload?.users;
+  console.log(users_status, 'users_status users_status')
   const [selectManagerData, setSelectManagerData] = useState({});
   const [addReason, setAddReason] = useState('');
 
@@ -120,7 +122,7 @@ const DashLayout = ({ currentScreen }) => {
     setSelectedStaff({})
   };
 
-  const mutationSubmitLeaveRequest = useMutation((data) => postData(data, 'leave-request/update'), {
+  const mutationSubmitLeaveRequest = useMutation((data) => putData(data, 'leave-request/update'), {
     onSuccess: (res) => {
       setShowLeaveModalApproval(false);
       Toastify({
@@ -143,15 +145,14 @@ const DashLayout = ({ currentScreen }) => {
   });
 
   const handleLeaveApproval = (leaveList, status) => {
-    console.log(selectedStaff, 'leaveList')
     const data = {
       userId: selectedStaff.id ,
-      managerId: '<the manager id>',
+      managerId: selectedStaff.manager.id,
       leaveRequestId: leaveList.id,
       status: status,
       reason: addReason,
     };
-    //mutationSubmitLeaveRequest.mutate(data);
+    mutationSubmitLeaveRequest.mutate(data);
   };
 
   const handleShow = () => setShow(true);
@@ -323,7 +324,7 @@ const DashLayout = ({ currentScreen }) => {
                         <td>{employee.id}</td>
                         <td>{`${employee.firstName} ${employee.lastName}`}</td>
                         <td>{employee.emailAddress}</td>
-                        <td>{employee.managerName == null ? 'Not assigned' : employee.managerName}</td>
+                        <td>{employee.manager == null ? 'Not assigned' : employee.manager.managerName}</td>
                         <td>
                           {
                             employee.leave_requests.length === 0
@@ -381,7 +382,7 @@ const DashLayout = ({ currentScreen }) => {
                 </thead>
                 <tbody>
                   {
-                    users_status?.filter((employee) => employee.managerName != null).map((employee, index) => (
+                    users_status?.filter((employee) => employee.manager != null).map((employee, index) => (
                       <tr key={index}>
                         <td>{employee.id}</td>
                         <td>{`${employee.firstName} ${employee.lastName}`}</td>
@@ -739,14 +740,14 @@ const DashLayout = ({ currentScreen }) => {
                   <div className="dashLayout__add-reason">
                     <Button 
                       variant="outline-primary"
-                      onClick={() =>handleLeaveApproval(leaveList, 'Approve')}
+                      onClick={() =>handleLeaveApproval(leaveList, 'Approved')}
                       disabled={addReason.length === 0}
                     >
                       Approve
                     </Button>
                     <Button 
                       variant="outline-danger"
-                      onClick={() => handleLeaveApproval(leaveList, 'Reject')}
+                      onClick={() => handleLeaveApproval(leaveList, 'Rejected')}
                       disabled={addReason.length === 0}
                     >
                       Reject

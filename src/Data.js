@@ -3,6 +3,20 @@ import { QueryClient } from 'react-query'
 
 export const baseUrlLink = 'https://sheltered-wildwood-06244-2353b78d164a.herokuapp.com/api/v1';
 
+export const putData = async (data, url) => {
+  const options = {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  };
+  const response = await fetch(`${baseUrlLink}/${url}`, options);
+  return response.json();
+};
+
+
+
 export const postData = async (data, url) => {
   const options = {
     method: 'POST',
@@ -14,6 +28,7 @@ export const postData = async (data, url) => {
   const response = await fetch(`${baseUrlLink}/${url}`, options);
   return response.json();
 };
+
 
 
 export const getData = async (url) => {
