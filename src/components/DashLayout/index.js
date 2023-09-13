@@ -67,6 +67,7 @@ const DashLayout = ({ currentScreen }) => {
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState({});
   const { data, error }  = useQuery('totalData', () => getData('stats/'));
+  const calenderData = useQuery('calender', () => getData(`leave-request/calendar-events/${user.userDetails.id}`))
   const [applyLeaveForm, setApplyLeaveForm] = useState({
     leaveStart: '' , 
     leaveEnd: '',
@@ -77,10 +78,9 @@ const DashLayout = ({ currentScreen }) => {
   const userList = useQuery('userList', () => getData('user/admin/all-users'));
   const leaveQuestList = useQuery('leaveRequest', () => getData(`leave-request/requests/${user?.userDetails?.id}`));
   const users_status = userList?.data?.payload?.users;
-  console.log(users_status, 'users_status users_status')
   const [selectManagerData, setSelectManagerData] = useState({});
   const [addReason, setAddReason] = useState('');
-
+  console.log(calenderData, 'calenderData calenderData', calenderData?.payload?.calendar_events);
   const handleLogout = () => {
     Toastify({
       text: "Logout was successful",
@@ -111,7 +111,7 @@ const DashLayout = ({ currentScreen }) => {
   };
 
   const localizer = momentLocalizer(moment);
-  const [events] = useState(getEvents());
+  const [events] = useState(calenderData?.payload?.calendar_events);
 
   const handleApproval = (value) => {
     console.log(value)
@@ -499,9 +499,6 @@ const DashLayout = ({ currentScreen }) => {
               </Table>
                 )
               }
-
-
-             
             </div>
           </div>
         </Tab>
@@ -710,69 +707,87 @@ const DashLayout = ({ currentScreen }) => {
         {
           currentScreen === 'Setting' && (
             <div className="dashLayout__setting">
-            <h1 className="dashLayout__setting-h1">Apply for leave</h1>
-            <Form style={{ width: "100%"}}>
-              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                <Form.Label style={{ fontWeight: 'Bold' }}>Leave Start date</Form.Label>
-                <Form.Control 
-                  type="date" 
-                  placeholder="" 
-                  name="leaveStart"
-                  onChange={(e) => setApplyLeaveForm({
-                    ...applyLeaveForm,
-                    leaveStart: e.target.value
-                  }) }
-                />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                <Form.Label style={{ fontWeight: 'Bold' }}>Leave End date</Form.Label>
-                <Form.Control 
-                  type="date" 
-                  placeholder="" 
-                  name="leaveEnd"
-                  onChange={(e) => setApplyLeaveForm({
-                    ...applyLeaveForm,
-                    leaveEnd: e.target.value
-                  }) }
-                />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-              <Form.Label style={{ fontWeight: 'Bold' }} >Event Type</Form.Label>
-              <Form.Select 
-                size="lg" 
-                name="eventType"
-                onChange={(e) => setApplyLeaveForm({
-                  ...applyLeaveForm,
-                  eventType: e.target.value
-                }) }
+              <Tabs
+                defaultActiveKey="apply"
+                id="uncontrolled-tab-example"
+                className="mb-3"
               >
-                <option>Select from dropdown</option>
-                  {
-                    leaveType.map((type, index) => <option key={index} value={type}>{type}</option>)
-                  }
-              </Form.Select>
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                <Form.Label style={{ fontWeight: 'Bold' }}>Description</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  placeholder="" 
-                  name="description"
-                  onChange={(e) => setApplyLeaveForm({
-                    ...applyLeaveForm,
-                    description: e.target.value
-                  }) }
-                />
-              </Form.Group>
-            </Form>
-            <div className="dashLayout__submit-button">
-              <Button 
-                variant="outline-primary" 
-                onClick={handleApplyLeave}
-              >
-              Submit
-            </Button>
-            </div>
+                <Tab eventKey="apply" title="Apply for leave">
+                  <h1 className="dashLayout__setting-h1">Apply for leave</h1>
+                  <Form style={{ width: "100%"}}>
+                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                      <Form.Label style={{ fontWeight: 'Bold' }}>Leave Start date</Form.Label>
+                      <Form.Control 
+                        type="date" 
+                        placeholder="" 
+                        name="leaveStart"
+                        onChange={(e) => setApplyLeaveForm({
+                          ...applyLeaveForm,
+                          leaveStart: e.target.value
+                        }) }
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                      <Form.Label style={{ fontWeight: 'Bold' }}>Leave End date</Form.Label>
+                      <Form.Control 
+                        type="date" 
+                        placeholder="" 
+                        name="leaveEnd"
+                        onChange={(e) => setApplyLeaveForm({
+                          ...applyLeaveForm,
+                          leaveEnd: e.target.value
+                        }) }
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                    <Form.Label style={{ fontWeight: 'Bold' }} >Event Type</Form.Label>
+                    <Form.Select 
+                      size="lg" 
+                      name="eventType"
+                      onChange={(e) => setApplyLeaveForm({
+                        ...applyLeaveForm,
+                        eventType: e.target.value
+                      }) }
+                    >
+                      <option>Select from dropdown</option>
+                        {
+                          leaveType.map((type, index) => <option key={index} value={type}>{type}</option>)
+                        }
+                    </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                      <Form.Label style={{ fontWeight: 'Bold' }}>Description</Form.Label>
+                      <Form.Control 
+                        type="text" 
+                        placeholder="" 
+                        name="description"
+                        onChange={(e) => setApplyLeaveForm({
+                          ...applyLeaveForm,
+                          description: e.target.value
+                        }) }
+                      />
+                    </Form.Group>
+                  </Form>
+                  <div className="dashLayout__submit-button">
+                  <Button 
+                    variant="outline-primary" 
+                    onClick={handleApplyLeave}
+                    >
+                  Submit
+                </Button>
+                </div>
+                </Tab>
+                <Tab eventKey="calender" title="Calender">
+                  <Calendar
+                    localizer={localizer}
+                    events={events}
+                    views={['month', 'work_week', 'agenda']}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: 500 }}
+                  />
+                </Tab>
+              </Tabs>
           </div>
           ) 
         }
