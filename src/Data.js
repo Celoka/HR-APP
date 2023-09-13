@@ -55,7 +55,8 @@ export const toastProperty = {
 }
 
 export const success =  {
-  background: "linear-gradient(to right, #00b09b, #96c93d)",
+  background: "#000",
+  color: '#fff'
 };
 
 export const error =  {

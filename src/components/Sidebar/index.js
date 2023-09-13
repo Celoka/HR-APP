@@ -18,9 +18,9 @@ const Sidebar = ({ setCurrentScreen }) => {
   };
 
   const roleCheck = {
-    "super admin": ['Dashboard', 'Employee', 'Documents', 'Account', 'Setting'],
-    admin: ['Documents', 'Account', 'Setting', 'Employee'],
-    manager: ['Documents', 'Account', 'Setting',],
+    "super admin": ['Dashboard', 'Employee', 'Documents', 'Account'],
+    admin: ['Documents', 'Account', 'Employee'],
+    manager: ['Documents', 'Account',],
     staff: ['Documents', 'Account', 'Setting'],
   };
 
@@ -106,7 +106,7 @@ const Sidebar = ({ setCurrentScreen }) => {
 
           
           {
-            roleCheck[role.toLowerCase()].includes('Documents') && 
+            roleCheck[role.toLowerCase()].includes('Setting') && 
             (
               <li 
                 className={`sidebar__li ${active === "setting" ? "sidebar__li-active" : " "}`}

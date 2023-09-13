@@ -302,69 +302,111 @@ const DashLayout = ({ currentScreen }) => {
           <div className="dashLayout__employ">
             <h1 className="dashLayout__employ-title">Employee List</h1>
             <div>
-              <Table striped bordered hover size="lg">
-                <thead>
-                  <tr>
-                    <th>#Id</th>
-                    <th>Full Name</th>
-                    <th>Email Address</th>
-                    <th>Manager</th>
-                    <th>View leaves</th>
+              {
+                user.userDetails.role === 'Super admin'
+                ? (
+                  <Table striped bordered hover size="lg">
+                    <thead>
+                      <tr>
+                        <th>#Id</th>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th>Manager</th>
+                        <th>View leaves</th>
+                        <th>Assign a Manager</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                     {
-                      user.userDetails.role === 'Super admin' 
-                      ? (<th>Assign a Manager</th>) 
-                      : null
-                    }
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    users_status?.map((employee, index) => (
-                      <tr key={index}>
-                        <td>{employee.id}</td>
-                        <td>{`${employee.firstName} ${employee.lastName}`}</td>
-                        <td>{employee.emailAddress}</td>
-                        <td>{employee.manager == null ? 'Not assigned' : employee.manager.managerName}</td>
-                        <td>
-                          {
-                            employee.leave_requests.length === 0
-                            ? 'No leave application'
-                            : (
-                              <Button
+                      users_status?.map((employee, index) => (
+                        <tr key={index}>
+                          <td>{employee.id}</td>
+                          <td>{`${employee.firstName} ${employee.lastName}`}</td>
+                          <td>{employee.emailAddress}</td>
+                          <td>{employee.manager == null ? 'Not assigned' : employee.manager.managerName}</td>
+                          <td>
+                            {
+                              employee.leave_requests.length === 0
+                              ? 'No leave application'
+                              : (
+                                <Button
+                                variant="outline-primary" 
+                                onClick={() => {
+                                  setSelectedStaff(employee)
+                                  setShowLeaveModal(true)
+                                }
+                              }
+                              >
+                                View Leaves
+                                </Button>
+                              )
+                            }
+                          </td>
+                          <td>
+                            <Button 
                               variant="outline-primary" 
                               onClick={() => {
-                                setSelectedStaff(employee)
-                                setShowLeaveModal(true)
-                              }
-                            }
-                            >
-                              View Leaves
-                              </Button>
-                            )
-                          }
-                        </td>
-                        {
-                          user.userDetails.role === 'Super admin' 
-                          ? (
-                            <td>
-                            <Button 
-                            variant="outline-primary" 
-                            onClick={() => {
                                 setSelectedStaff(employee)
                                 handleShow()
                                 }
                               }
                             >
-                            Open
-                            </Button>
-                          </td>
-                          ): null
-                        }
-                      </tr>
-                    ))
-                  }
-              </tbody>
-            </Table>
+                              Open
+                              </Button>
+                            </td>
+                        </tr>
+                        ))
+                      }
+                    </tbody>
+                  </Table>
+                )
+                :
+                (
+                  <Table striped bordered hover size="lg">
+                    <thead>
+                        <tr>
+                          <th>#Id</th>
+                          <th>Full Name</th>
+                          <th>Email Address</th>
+                          <th>Manager</th>
+                          <th>View leaves</th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        users_status.filter((noManager) => noManager.manager != null).filter((sameManager) => sameManager.manager.managerName === `${firstName} ${lastName}`)
+                        ?.map((employee, index) => (
+                          <tr key={index}>
+                            <td>{employee.id}</td>
+                            <td>{`${employee.firstName} ${employee.lastName}`}</td>
+                            <td>{employee.emailAddress}</td>
+                            <td>{employee?.manager?.managerName}</td>
+                            <td>
+                              {
+                                employee.leave_requests.length === 0
+                                  ? 'No leave application'
+                                  : (
+                                    <Button
+                                    variant="outline-primary" 
+                                    onClick={() => {
+                                      setSelectedStaff(employee)
+                                      setShowLeaveModal(true)
+                                    }
+                                  }
+                                  >
+                                    View Leaves
+                                    </Button>
+                                  )
+                              }
+                            </td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                  </Table>
+                )
+              }
+  
             </div>
           </div>
         </Tab>
@@ -372,44 +414,94 @@ const DashLayout = ({ currentScreen }) => {
         <div className="dashLayout__employ">
             <h1 className="dashLayout__employ-title">Pending Employee Leave List</h1>
             <div>
-              <Table striped bordered hover size="lg">
-                <thead>
-                  <tr>
-                    <th>#Id</th>
-                    <th>Full Name</th>
-                    <th>Email Address</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    users_status?.filter((employee) => employee.manager != null).map((employee, index) => (
-                      <tr key={index}>
-                        <td>{employee.id}</td>
-                        <td>{`${employee.firstName} ${employee.lastName}`}</td>
-                        <td>{employee.emailAddress}</td>
-                        <td>
-                          {
-                            employee.leave_requests.length === 0
-                            ? 'No leave application'
-                            : (
-                              <Button
-                              variant="outline-primary" 
-                              onClick={() => {
-                                setSelectedStaff(employee)
-                                setShowLeaveModalApproval(true)
-                              }
-                            }
-                            >
-                              View Leaves
-                              </Button>
-                            )
-                          }
-                        </td>
+              {
+                user.userDetails.role === 'Super admin'
+                ? (
+                  <Table striped bordered hover size="lg">
+                    <thead>
+                      <tr>
+                        <th>#Id</th>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
                       </tr>
-                    ))
-                  }
-              </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                      {
+                        users_status?.filter((employee) => employee.manager != null).map((employee, index) => (
+                          <tr key={index}>
+                            <td>{employee.id}</td>
+                            <td>{`${employee.firstName} ${employee.lastName}`}</td>
+                            <td>{employee.emailAddress}</td>
+                            <td>
+                              {
+                                employee.leave_requests.length === 0
+                                ? 'No leave application'
+                                : (
+                                  <Button
+                                  variant="outline-primary" 
+                                  onClick={() => {
+                                    setSelectedStaff(employee)
+                                    setShowLeaveModalApproval(true)
+                                  }
+                                }
+                                >
+                                  View Leaves
+                                  </Button>
+                                )
+                              }
+                            </td>
+                          </tr>
+                        ))
+                      }
+                  </tbody>
+                  </Table>
+                )
+                : 
+                (
+                  <Table striped bordered hover size="lg">
+                  <thead>
+                    <tr>
+                      <th>#Id</th>
+                      <th>Full Name</th>
+                      <th>Email Address</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      users_status.filter((noManager) => noManager.manager != null).filter((sameManager) => sameManager.manager.managerName === `${firstName} ${lastName}`)
+                        ?.map((employee, index) => (
+                        <tr key={index}>
+                          <td>{employee.id}</td>
+                          <td>{`${employee.firstName} ${employee.lastName}`}</td>
+                          <td>{employee.emailAddress}</td>
+                          <td>
+                            {
+                              employee.leave_requests.length === 0
+                              ? 'No leave application'
+                              : (
+                                <Button
+                                variant="outline-primary" 
+                                onClick={() => {
+                                  setSelectedStaff(employee)
+                                  setShowLeaveModalApproval(true)
+                                }
+                              }
+                              >
+                                View Leaves
+                                </Button>
+                              )
+                            }
+                          </td>
+                        </tr>
+                      ))
+                    }
+                </tbody>
+              </Table>
+                )
+              }
+
+
+             
             </div>
           </div>
         </Tab>
